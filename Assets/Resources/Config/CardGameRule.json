@@ -1,0 +1,10 @@
+{
+  "specialCardWeightThreshold": 15,
+  "littleJokerWeight": 16,
+  "bigJokerWeight": 17,
+  "straightMinCount": 5,
+  "straightMaxCount": 12,
+  "straightPairMinGroups": 3,
+  "planeMinGroups": 2,
+  "refuseCountToReset": 2
+}

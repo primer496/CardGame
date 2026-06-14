@@ -1,0 +1,10 @@
+{
+  "totalCardCount": 54,
+  "normalCardCount": 52,
+  "weightAce": 14,
+  "weightTwo": 15,
+  "weightLittleJoker": 16,
+  "weightBigJoker": 17,
+  "lordCardCount": 3,
+  "playerCount": 3
+}
