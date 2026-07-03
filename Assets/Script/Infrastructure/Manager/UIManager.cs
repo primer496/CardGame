@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager
 {
@@ -9,6 +10,11 @@ public class UIManager
     private Dictionary<string, string> pathDict;        // 路径配置字典
     private Dictionary<string, GameObject> prefabDict;  // 预制体缓存字典
     public Dictionary<string, BasePanel> panelDict;     // 已打开界面的缓存字典
+
+    /// <summary>CanvasScaler 参考分辨率</summary>
+    public const float ReferenceWidth = 1920f;
+    public const float ReferenceHeight = 1080f;
+
     public static UIManager Instance
     {
         get
@@ -33,6 +39,14 @@ public class UIManager
                 else
                 {
                     _uiRoot = new GameObject("Canvas").transform;
+                }
+                // 确保 CanvasScaler 匹配移动端多分辨率（组件场景中已挂载，仅校准参数）
+                var scaler = _uiRoot.GetComponent<CanvasScaler>();
+                if (scaler != null)
+                {
+                    scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                    scaler.referenceResolution = new Vector2(ReferenceWidth, ReferenceHeight);
+                    scaler.matchWidthOrHeight = 1.0f;
                 }
             }
             return _uiRoot;
@@ -115,6 +129,22 @@ public class UIManager
     public bool CheckPanelIsOpen(string name)
     {
         return panelDict.ContainsKey(name);
+    }
+
+    /// <summary>
+    /// 清理所有已打开面板的缓存（销毁面板对象并清空字典）。
+    /// 用于场景切换前重置 UI 状态，避免旧引用阻止重新打开面板。
+    /// </summary>
+    public void ClearAllPanels()
+    {
+        foreach (var kvp in panelDict)
+        {
+            if (kvp.Value != null && kvp.Value.gameObject != null)
+            {
+                GameObject.Destroy(kvp.Value.gameObject);
+            }
+        }
+        panelDict.Clear();
     }
 }
 public class UIConst

@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -60,6 +61,16 @@ public class ResultPresenter
 
     private void OnReturnClicked()
     {
+        // 1. 断开所有网络连接并关闭服务器，回到未连接状态
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        // 2. 清理 UIManager 面板缓存，避免场景切换后旧引用阻止重新打开面板
+        UIManager.Instance.ClearAllPanels();
+
+        // 3. 加载主场景
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 }

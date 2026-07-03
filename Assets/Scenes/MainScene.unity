@@ -330,6 +330,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 7346692022315907366, guid: c7f56f013f83a544d8095112fe31dbd3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.38305664
+      objectReference: {fileID: 0}
     - target: {fileID: 7996211489012566636, guid: c7f56f013f83a544d8095112fe31dbd3, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
