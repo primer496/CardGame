@@ -2,7 +2,8 @@ using System.Collections.Generic;
 
 public interface IServerRpcSender
 {
-    void BroadcastCards(ServerGameModel model);
+    /// <summary>定向发送：每个客户端只收到自己的手牌；全员收到底牌和各家牌数。</summary>
+    void DeliverCardsForAllPlayers(ServerGameModel model);
     void BroadcastBiddingTurn(int playerIndex);
     void BroadcastLordConfirmed(int lordIndex);
     void BroadcastTurnStart(int playerIndex);

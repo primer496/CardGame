@@ -44,6 +44,9 @@ public class StartScenePresenter : MonoBehaviour
             return;
         }
 
+        // 强制横屏（1920×1080 设计基准），避免部分设备忽略 Build Settings 的朝向配置
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+
         soundService = SoundService.Instance;
         uiNavigator = new UIManagerUiNavigator();
         ResolveStartView();

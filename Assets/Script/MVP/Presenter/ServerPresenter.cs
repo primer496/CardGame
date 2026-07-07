@@ -24,7 +24,7 @@ public class ServerPresenter
 
         model.DealCards(deckService);
         model.CurrentState = GameEnums.Bidding;
-        sender.BroadcastCards(model);
+        sender.DeliverCardsForAllPlayers(model);
         sender.BroadcastBiddingTurn(model.CurrentPlayerIndex);
     }
 
@@ -44,7 +44,7 @@ public class ServerPresenter
         model.CurrentPlayerIndex = playerIndex;
         model.CurrentState = GameEnums.Playing;
 
-        sender.BroadcastCards(model);
+        sender.DeliverCardsForAllPlayers(model);
         sender.BroadcastLordConfirmed(model.CurrentPlayerIndex);
         sender.BroadcastTurnStart(model.CurrentPlayerIndex);
     }
@@ -78,7 +78,7 @@ public class ServerPresenter
         model.RemovePlayerCards(playerIndex, outCards);
         int remaining = model.GetPlayerCards(playerIndex).Count;
         sender.BroadcastCardCondition(playerIndex, playerIndex == model.LordIndex, remaining);
-        sender.BroadcastCards(model);
+        sender.DeliverCardsForAllPlayers(model);
 
         if (remaining == 0)
         {

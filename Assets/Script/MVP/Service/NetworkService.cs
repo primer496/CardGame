@@ -22,7 +22,9 @@ public class NetworkService : MonoBehaviour, INetworkService
         }
     }
 
-    public event Action<string, string, string, string> OnCardsDelivered;
+    public event Action<string> OnMyCardsReceived;
+    public event Action<string> OnLordCardsReceived;
+    public event Action<int, int, int, int> OnCardCountsUpdated;
     public event Action<int> OnBiddingTurn;
     public event Action<int> OnPlayerIdAssigned;
     public event Action<int> OnLordConfirmed;
@@ -87,9 +89,19 @@ public class NetworkService : MonoBehaviour, INetworkService
         GameServer.Instance.UpdateTurnServerRpc(localId);
     }
 
-    public void NotifyCardsDelivered(string json1, string json2, string json3, string lordJson)
+    public void NotifyMyCardsReceived(string cardsJson)
     {
-        OnCardsDelivered?.Invoke(json1, json2, json3, lordJson);
+        OnMyCardsReceived?.Invoke(cardsJson);
+    }
+
+    public void NotifyLordCardsReceived(string cardsJson)
+    {
+        OnLordCardsReceived?.Invoke(cardsJson);
+    }
+
+    public void NotifyCardCountsUpdated(int p1Count, int p2Count, int p3Count, int lordCount)
+    {
+        OnCardCountsUpdated?.Invoke(p1Count, p2Count, p3Count, lordCount);
     }
 
     public void NotifyBiddingTurn(int playerIndex)

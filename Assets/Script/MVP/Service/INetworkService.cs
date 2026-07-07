@@ -2,7 +2,12 @@ using System;
 
 public interface INetworkService
 {
-    event Action<string, string, string, string> OnCardsDelivered;
+    /// <summary>定向：仅本客户端收到自己的手牌 JSON。</summary>
+    event Action<string> OnMyCardsReceived;
+    /// <summary>广播：全员收到底牌 JSON（背面显示）。</summary>
+    event Action<string> OnLordCardsReceived;
+    /// <summary>广播：全员收到各玩家手牌数量 (p1,p2,p3,lord)。</summary>
+    event Action<int, int, int, int> OnCardCountsUpdated;
     event Action<int> OnBiddingTurn;
     event Action<int> OnPlayerIdAssigned;
     event Action<int> OnLordConfirmed;

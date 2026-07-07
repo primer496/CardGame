@@ -162,13 +162,54 @@ public class GameServer : NetworkBehaviour, IServerRpcSender
         serverPresenter.OnChooseLord(playerIndex);
     }
 
-    public void BroadcastCards(ServerGameModel model)
+    /// <summary>
+    /// 定向发牌：每个客户端只收到自己的手牌（定向 ClientRpc），
+    /// 全员收到底牌（背面）和各玩家余牌数。防止全量卡牌泄露。
+    /// </summary>
+    public void DeliverCardsForAllPlayers(ServerGameModel model)
     {
-        string cards1Json = JsonUtility.ToJson(new CardListWrapper { cards = model.Player1Cards });
-        string cards2Json = JsonUtility.ToJson(new CardListWrapper { cards = model.Player2Cards });
-        string cards3Json = JsonUtility.ToJson(new CardListWrapper { cards = model.Player3Cards });
-        string lordCardsJson = JsonUtility.ToJson(new CardListWrapper { cards = model.LordCards });
-        DeliveryCardClientRpc(cards1Json, cards2Json, cards3Json, lordCardsJson);
+        // 1. 定向发送：每个客户端只拿到自己的手牌
+        foreach (var kvp in clientToPlayerId)
+        {
+            ulong clientId = kvp.Key;
+            int playerIndex = kvp.Value;
+            var cards = model.GetPlayerCards(playerIndex);
+            string json = JsonUtility.ToJson(new CardListWrapper { cards = cards });
+            var clientParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
+            };
+            DeliverMyCardsClientRpc(json, clientParams);
+        }
+
+        // 2. 全员广播：底牌（背面朝上，地主确认后翻开）
+        string lordJson = JsonUtility.ToJson(new CardListWrapper { cards = model.LordCards });
+        DeliverLordCardsClientRpc(lordJson);
+
+        // 3. 全员广播：各家手牌数量
+        UpdateCardCountsClientRpc(
+            model.Player1Cards.Count,
+            model.Player2Cards.Count,
+            model.Player3Cards.Count,
+            model.LordCards.Count);
+    }
+
+    [ClientRpc]
+    private void DeliverMyCardsClientRpc(string cardsJson, ClientRpcParams clientRpcParams = default)
+    {
+        NetworkService.Instance.NotifyMyCardsReceived(cardsJson);
+    }
+
+    [ClientRpc]
+    private void DeliverLordCardsClientRpc(string cardsJson)
+    {
+        NetworkService.Instance.NotifyLordCardsReceived(cardsJson);
+    }
+
+    [ClientRpc]
+    private void UpdateCardCountsClientRpc(int p1Count, int p2Count, int p3Count, int lordCount)
+    {
+        NetworkService.Instance.NotifyCardCountsUpdated(p1Count, p2Count, p3Count, lordCount);
     }
 
     public void BroadcastBiddingTurn(int playerIndex)
@@ -229,16 +270,6 @@ public class GameServer : NetworkBehaviour, IServerRpcSender
         };
         PlayValidationResultClientRpc(result, clientParams);
     }
-    /// <summary>
-    /// 用 JSON 传递牌组，绕开 CodeGen 对 List&lt;Card&gt; 的自动序列化限制。
-    /// </summary>
-    /// <param name="cardsJson"></param>
-    [ClientRpc]
-    public void DeliveryCardClientRpc(string cards1Json,string cards2Json,string cards3Json,string lordCardsJson)
-    {
-        NetworkService.Instance.NotifyCardsDelivered(cards1Json, cards2Json, cards3Json, lordCardsJson);
-    }
-
     [ClientRpc]
     public void AddLordCardsClientRpc(int lordIndex)
     {

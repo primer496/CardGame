@@ -36,11 +36,13 @@ public class SoundService : MonoBehaviour, ISoundService
 
     public void PlayWinBgm()
     {
+        if (SoundManager.instance == null) return;
         SoundManager.instance.PlayBGM(AudioPath.BGMWin, 1f, false);
     }
 
     public void PlayLoseBgm()
     {
+        if (SoundManager.instance == null) return;
         SoundManager.instance.PlayBGM(AudioPath.BGMLose, 1f, false);
     }
 

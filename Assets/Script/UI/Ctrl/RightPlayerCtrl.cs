@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RightPlayerCtrl : MonoBehaviour, IOpponentHandView
+public class RightPlayerCtrl : MonoBehaviour
 {
     private List<Card> cards;
     public GameObject cardPrefab;
@@ -10,6 +10,25 @@ public class RightPlayerCtrl : MonoBehaviour, IOpponentHandView
     {
         cards = new List<Card>();
         Refresh(cards);
+    }
+
+    private void OnEnable()
+    {
+        var gp = GamePresenter.Instance;
+        if (gp != null) gp.OnLocalCardsUpdated += OnLocalCardsUpdated;
+    }
+
+    private void OnDisable()
+    {
+        var gp = GamePresenter.Instance;
+        if (gp != null) gp.OnLocalCardsUpdated -= OnLocalCardsUpdated;
+    }
+
+    private void OnLocalCardsUpdated()
+    {
+        var model = GamePresenter.Instance?.Model;
+        if (model == null) return;
+        Refresh(model.GetPlayerCards(model.RightPlayerIndex));
     }
 
     public void Refresh(List<Card> cards)

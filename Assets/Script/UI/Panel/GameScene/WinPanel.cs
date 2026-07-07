@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
-public class WinPanel : BasePanel, IWinView
+public class WinPanel : BasePanel
 {
-    public event System.Action ReturnClicked;
-
     private Transform UIWinText;
     private Transform UIRewardText;
     private Transform UIReturnButton;
@@ -25,10 +23,41 @@ public class WinPanel : BasePanel, IWinView
             }
         }
     }
+
+    private void OnEnable()
+    {
+        var ns = NetworkService.Instance;
+        if (ns != null) ns.OnGameOver += OnGameOver;
+    }
+
+    private void OnDisable()
+    {
+        var ns = NetworkService.Instance;
+        if (ns != null) ns.OnGameOver -= OnGameOver;
+    }
+
+    private void OnGameOver(int playerIndex, bool isLord)
+    {
+        var model = GamePresenter.Instance?.Model;
+        if (model == null) return;
+
+        ShowWinResult(isLord);
+        if (playerIndex == model.LocalPlayerIndex)
+            SoundService.Instance?.PlayWinBgm();
+        else
+            SoundService.Instance?.PlayLoseBgm();
+    }
+
     private void OnClickReturnButton()
     {
-        ReturnClicked?.Invoke();
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+        UIManager.Instance.ClearAllPanels();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
+
     public void ShowWinResult(bool isLord)
     {
         ResolveRefs();
