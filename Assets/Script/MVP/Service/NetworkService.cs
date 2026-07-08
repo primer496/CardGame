@@ -40,6 +40,23 @@ public class NetworkService : MonoBehaviour, INetworkService
 
     public int CachedAssignedPlayerIndex => _cachedAssignedPlayerIndex;
 
+    /// <summary>场景切换前：清空所有事件订阅，让 DontDestroyOnLoad 单例干净进入下一场景。</summary>
+    public void ResetAllEvents()
+    {
+        OnMyCardsReceived = null;
+        OnLordCardsReceived = null;
+        OnCardCountsUpdated = null;
+        OnBiddingTurn = null;
+        OnPlayerIdAssigned = null;
+        OnLordConfirmed = null;
+        OnTurnStarted = null;
+        OnOutCardsReceived = null;
+        OnPlayValidation = null;
+        OnGameOver = null;
+        OnPreCardsUpdated = null;
+        OnPreCardsReset = null;
+    }
+
     private void Awake()
     {
         if (_instance == null)
@@ -51,6 +68,11 @@ public class NetworkService : MonoBehaviour, INetworkService
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
     }
 
     public void PreparePlayer(int localId)

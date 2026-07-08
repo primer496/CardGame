@@ -35,8 +35,12 @@ public class EnterPanel : BasePanel
 
     private void OnEnable()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        Debug.Log($"[EnterPanel] OnEnable: NM.Singleton={NetworkManager.Singleton != null}, IsListening={NetworkManager.Singleton?.IsListening}");
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
     }
 
     private void OnDisable()
@@ -63,11 +67,18 @@ public class EnterPanel : BasePanel
 
     private void OnClickCreateButton()
     {
+        Debug.Log($"[EnterPanel] OnClickCreate: NM.Singleton={NetworkManager.Singleton != null}");
         var config = NetworkManager.Singleton?.GetComponent<NetworkTransportRuntimeConfig>();
         if (config != null)
+        {
+            Debug.Log("[EnterPanel] µ÷ÓÃ StartAsHost");
             config.StartAsHost();
+        }
         else
+        {
+            Debug.Log("[EnterPanel] ÎŞ config, Ö±½Ó StartHost");
             NetworkManager.Singleton?.StartHost();
+        }
 
         if (hostIpText != null)
             hostIpText.text = "IP: " + GetLocalLanIp();
@@ -75,16 +86,16 @@ public class EnterPanel : BasePanel
 
     private void OnClientConnected(ulong clientId)
     {
-        Debug.Log($"Client connected with ID: {clientId}");
+        Debug.Log($"[EnterPanel] Client connected: {clientId}, ¼´½«¼ÓÔØ GameScene");
         SceneManager.LoadScene("GameScene");
     }
 
     private void OnClientDisconnected(ulong clientId)
     {
-        Debug.Log($"Client disconnected with ID: {clientId}");
+        Debug.Log($"[EnterPanel] Client disconnected: {clientId}");
     }
 
-    // è·å–æœ¬æœºå±€åŸŸç½‘ IPv4ï¼ˆä¼˜å…ˆè¿”å› 192.168.x.x / 10.x.x.x / 172.x.x.xï¼‰
+    // è·å–æœ¬æœºå±¢ãåŸŸç½‘ IPv4ï¼ˆä¼˜å…ˆè¿”å›„1¤7 192.168.x.x / 10.x.x.x / 172.x.x.xï¼„1¤7
     private static string GetLocalLanIp()
     {
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())

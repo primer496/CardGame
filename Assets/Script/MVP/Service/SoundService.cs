@@ -34,6 +34,11 @@ public class SoundService : MonoBehaviour, ISoundService
         }
     }
 
+    private void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
+    }
+
     public void PlayWinBgm()
     {
         if (SoundManager.instance == null) return;

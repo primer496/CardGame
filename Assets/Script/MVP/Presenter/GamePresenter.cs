@@ -34,6 +34,18 @@ public class GamePresenter : MonoBehaviour
         _ = Instance;
     }
 
+    /// <summary>
+    /// 场景切换前：解绑网络事件 + 清空本地事件 + 重置 Model。
+    /// 重置后立即重新绑定，因为 DontDestroyOnLoad 对象跨场景不会触发 OnEnable。
+    /// </summary>
+    public void ResetForSceneTransition()
+    {
+        UnbindNetworkEvents();
+        OnLocalCardsUpdated = null;
+        Model = new GameModel();
+        BindNetworkEvents();
+    }
+
     public GameModel Model { get; private set; }
 
     /// <summary>本地事件：Model 中的手牌数据已更新，View 应自行刷新。</summary>
@@ -70,6 +82,11 @@ public class GamePresenter : MonoBehaviour
     private void OnDisable()
     {
         UnbindNetworkEvents();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
     }
 
     private void BindNetworkEvents()

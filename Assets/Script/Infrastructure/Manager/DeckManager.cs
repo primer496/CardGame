@@ -33,6 +33,11 @@ public class DeckManager : MonoBehaviour, IDeckService
             return _instance;
         }
     }
+
+    private void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
+    }
     private void Awake()
     {
         // µ¥Àý³õÊ¼»¯

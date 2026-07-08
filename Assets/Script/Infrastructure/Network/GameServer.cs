@@ -19,6 +19,7 @@ public class GameServer : NetworkBehaviour, IServerRpcSender
         if (Instance == null)
         {
             Instance = this;
+            Debug.Log($"[GameServer] Awake ÐÂÊµÀý id={GetInstanceID()} scene={gameObject.scene.name}");
             DontDestroyOnLoad(gameObject);
 
             serverModel = new ServerGameModel();
@@ -26,13 +27,20 @@ public class GameServer : NetworkBehaviour, IServerRpcSender
         }
         else
         {
+            Debug.LogWarning($"[GameServer] Awake ÖØ¸´! old={Instance.GetInstanceID()} new={GetInstanceID()}");
             Destroy(gameObject);
             return;
         }
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
     private void OnEnable()
     {
+        Debug.Log($"[GameServer] OnEnable id={GetInstanceID()} IsServer={IsServer} IsHost={IsHost} IsClient={IsClient}");
         if (NetworkManager.Singleton != null)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;

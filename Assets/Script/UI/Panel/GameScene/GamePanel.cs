@@ -167,7 +167,18 @@ public class GamePanel : BasePanel
 
     private void OnGameOver(int playerIndex, bool isLord)
     {
-        // WinPanel 负责显示，GamePanel 可在此隐藏游戏 UI
+        // 打开 WinPanel 并传入结算数据（WinPanel 不会提前订阅 OnGameOver，由 GamePanel 驱动）
+        BasePanel winPanel = UIManager.Instance.OpenPanel(UIConst.WinPanel);
+        if (winPanel is WinPanel wp)
+        {
+            wp.ShowWinResult(isLord);
+        }
+
+        var model = GamePresenter.Instance?.Model;
+        if (model != null && playerIndex == model.LocalPlayerIndex)
+            SoundService.Instance?.PlayWinBgm();
+        else
+            SoundService.Instance?.PlayLoseBgm();
     }
 
     // ── UI 刷新 ──
